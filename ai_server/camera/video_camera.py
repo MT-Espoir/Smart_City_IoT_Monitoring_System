@@ -1,6 +1,6 @@
 from flask import Flask, render_template, Response, request, abort, jsonify
 from flask_cors import CORS
-from .camera import VideoCamera
+from camera.camera import VideoCamera
 import threading
 import time
 import cv2
@@ -11,9 +11,11 @@ from datetime import datetime
 
 # Import RFID MQTT components
 try:
-    from rfid_mqtt_server_v2 import RFIDMQTTServer  # Sử dụng version 2 với hỗ trợ vào/ra
-except ImportError:    from rfid_mqtt_server import RFIDMQTTServer  # Fallback to original version
-from .whitelist_db import WhitelistDB
+    from rfid.rfid_mqtt_server_v2 import RFIDMQTTServer  # Sử dụng version 2 với hỗ trợ vào/ra
+except ImportError:
+    from rfid.rfid_mqtt_server import RFIDMQTTServer  # Fallback to original version
+from database.whitelist_db import WhitelistDB
+from config.paths import PLATE_LOG_DIR, CAPTURED_PLATES_DIR
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for ThingsBoard integration
@@ -93,10 +95,10 @@ def snapshot():
                     "success": False,
                     "error": "Không thể lấy frame từ camera",
                     "timestamp": datetime.now().isoformat()                }), 500            # Trích xuất biển số trực tiếp từ frame thô (lossless)
-            from .camera import extract_plate_text_advanced, model
+            from camera.camera import extract_plate_text_advanced, model
             
             # Tạo thư mục lưu ảnh nếu chưa có
-            save_dir = "captured_plates"
+            save_dir = CAPTURED_PLATES_DIR
             os.makedirs(save_dir, exist_ok=True)
             
             extraction_result = extract_plate_text_advanced(
@@ -405,7 +407,7 @@ def save_plate_info():
         db = WhitelistDB()
         
         # Tạo thư mục lưu trữ JSON logs nếu chưa có (backup)
-        log_dir = "Data/plate_logs"
+        log_dir = PLATE_LOG_DIR
         os.makedirs(log_dir, exist_ok=True)
         
         # Tạo log entry cho JSON backup
@@ -550,7 +552,7 @@ def get_recent_plates():
             print(f"⚠️ Lỗi đọc từ MongoDB: {mongo_error}, fallback về JSON files")
             
             # Fallback về JSON files nếu MongoDB lỗi
-            log_dir = "Data/plate_logs"
+            log_dir = PLATE_LOG_DIR
             if os.path.exists(log_dir):
                 # Lấy log files từ 7 ngày gần đây
                 for i in range(7):
@@ -608,7 +610,7 @@ def plate_edit():
                 with open(temp_path, 'wb') as f:
                     f.write(frame)
                 try:
-                    from camera import extract_plate_text, model
+                    from camera.camera import extract_plate_text, model
                     plate_texts = extract_plate_text(temp_path, model)
                     
                     extraction_result = {
@@ -669,7 +671,7 @@ def save_plate_edit():
             print(f"⚠️ Biển số {license_plate} không đúng định dạng chuẩn, nhưng vẫn cho phép lưu")
         
         # Tạo thư mục lưu trữ
-        log_dir = "Data/plate_logs"
+        log_dir = PLATE_LOG_DIR
         os.makedirs(log_dir, exist_ok=True)
         
         # Tạo log entry
@@ -797,4 +799,7 @@ def main():
     
     # Start Flask app
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+if __name__ == "__main__":
+    main()
 

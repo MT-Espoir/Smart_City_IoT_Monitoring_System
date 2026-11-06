@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+
+# Dữ liệu sinh ra khi chạy
+Data/
+captured_plates/
+mqtt_snapshots/
+temp_snapshot_*.jpg
+
+# Model weights
+*.pt

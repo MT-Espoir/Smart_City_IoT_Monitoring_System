@@ -5,8 +5,8 @@ import threading
 import time
 import requests
 from datetime import datetime
-from src.whitelist_db import WhitelistDB
-from src.mqtt_config import *
+from database.whitelist_db import WhitelistDB
+from config.settings import *
 
 # Setup logging
 logging.basicConfig(

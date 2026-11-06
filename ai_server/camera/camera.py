@@ -20,12 +20,12 @@ import subprocess  # For executing ffmpeg
 # from IPython.display import display  # Import display for showing images
 import glob  # Import glob for file pattern matching
 from datetime import datetime  # For timestamp generation
-from whitelist_db import WhitelistDB  # Import database functionality
+from database.whitelist_db import WhitelistDB  # Import database functionality
+from config.paths import DATASET_DIR, IMAGE_DIR, MODEL_PATH
 # from run.detect.train7.weights import best  # Import the trained YOLOv8 model
 # Define dataset paths relative to script directory to create absolute paths
-script_dir = os.path.dirname(os.path.abspath(__file__))
-train_dir = os.path.join(script_dir, "Data", "license-plate-dataset", "images", "train")
-val_dir = os.path.join(script_dir, "Data", "license-plate-dataset", "images", "val")
+train_dir = os.path.join(DATASET_DIR, "images", "train")
+val_dir = os.path.join(DATASET_DIR, "images", "val")
 
 # Define class names
 classes = ["license_plate"]  # Add more classes if needed
@@ -33,7 +33,7 @@ classes = ["license_plate"]  # Add more classes if needed
 pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
 
 # Load the trained YOLOv8 model (assuming you have already trained it)
-model_path = os.path.join(script_dir, "..", "..", "yolov8n.pt")  # Path to YOLOv8 model in project root
+model_path = MODEL_PATH  # Path to YOLOv8 model (see config/paths.py)
 model = YOLO(model_path)
 
 def extract_plate_text_advanced(image_source, model, confidence_threshold=0.5, save_cropped=False, save_dir=None):
@@ -260,7 +260,7 @@ class VideoCamera:
         self.camera_index = camera_index
         self.cap = None
         self.model = model  # Use the globally loaded model
-        self.save_dir = os.path.join(script_dir, "Data", "image")
+        self.save_dir = IMAGE_DIR
         self.is_open = False
         self.auto_save_enabled = auto_save_enabled  # New flag to control auto-saving
         

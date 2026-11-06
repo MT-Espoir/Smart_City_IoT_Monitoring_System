@@ -105,8 +105,8 @@ def check_files():
         'camera/camera.py',
         'rfid/rfid_mqtt_server.py',
         'rfid/rfid_mqtt_server_v2.py',
-        'Database/whitelist_db.py',
-        'mqtt/mqtt_config.py'
+        'database/whitelist_db.py',
+        'config/settings.py'
     ]
     
     missing_files = []
@@ -131,17 +131,12 @@ def setup_environment():
     print("Đang thiết lập môi trường...")
     
     # Tạo thư mục cần thiết
-    directories = [
-        "Data/image",
-        "Data/plate_logs", 
-        "captured_plates",
-        "mqtt_snapshots"
-    ]
+    from config.paths import IMAGE_DIR, PLATE_LOG_DIR, CAPTURED_PLATES_DIR, SNAPSHOT_DIR
+    directories = [IMAGE_DIR, PLATE_LOG_DIR, CAPTURED_PLATES_DIR, SNAPSHOT_DIR]
     
-    for dir_path in directories:
-        full_path = os.path.join(os.path.dirname(src_dir), dir_path)
+    for full_path in directories:
         os.makedirs(full_path, exist_ok=True)
-        print(f"  📁 {dir_path}")
+        print(f"  📁 {os.path.relpath(full_path, src_dir)}")
     
     print("Môi trường đã sẵn sàng!")
 
@@ -180,7 +175,7 @@ def start_standalone_rfid():
     
     try:
         process = subprocess.Popen([
-            sys.executable, os.path.join('rfid', 'rfid_mqtt_server.py')
+            sys.executable, '-m', 'rfid.rfid_mqtt_server'
         ], cwd=src_dir)
         
         print("RFID MQTT Server đã khởi động!")
@@ -208,7 +203,7 @@ def start_camera_only():
     
     try:
         process = subprocess.Popen([
-            sys.executable, os.path.join('camera', 'video_camera.py')
+            sys.executable, '-m', 'camera.video_camera'
         ], cwd=src_dir)
         
         print("Camera System đã khởi động!")
@@ -236,7 +231,7 @@ def start_rfid_v2():
     
     try:
         process = subprocess.Popen([
-            sys.executable, os.path.join('rfid', 'rfid_mqtt_server_v2.py')
+            sys.executable, '-m', 'rfid.rfid_mqtt_server_v2'
         ], cwd=src_dir)
         
         print(" RFID MQTT Server v2 đã khởi động!")
@@ -267,7 +262,7 @@ def test_system():
     try:
         # Test database
         print("1. Kiểm tra Database...")
-        from src.whitelist_db import WhitelistDB
+        from database.whitelist_db import WhitelistDB
         db = WhitelistDB()
         cards = db.get_all_cards()
         print(f"    Database: {len(cards)} thẻ trong whitelist")
@@ -279,7 +274,7 @@ def test_system():
         
         # Test MQTT config
         print("2. Kiểm tra MQTT Config...")
-        from src.mqtt_config import MQTT_BROKER, MQTT_PORT, TOPIC_SUB, TOPIC_PUB
+        from config.settings import MQTT_BROKER, MQTT_PORT, TOPIC_SUB, TOPIC_PUB
         print(f"    MQTT Broker: {MQTT_BROKER}:{MQTT_PORT}")
         print(f"    Subscribe: {TOPIC_SUB}")
         print(f"    Publish: {TOPIC_PUB}")
@@ -295,7 +290,7 @@ def show_config():
     print("-" * 40)
     
     try:
-        import src.mqtt_config as mqtt_config
+        import config.settings as mqtt_config
         
         print("🔐 RFID MQTT Configuration:")
         print(f"  - MQTT Broker: {mqtt_config.MQTT_BROKER}:{mqtt_config.MQTT_PORT}")
@@ -334,8 +329,8 @@ def show_system_info():
         "camera/camera.py", 
         "rfid/rfid_mqtt_server.py",
         "rfid/rfid_mqtt_server_v2.py",
-        "Database/whitelist_db.py",
-        "mqtt/mqtt_config.py"
+        "database/whitelist_db.py",
+        "config/settings.py"
     ]
     
     print("\nCác file quan trọng:")

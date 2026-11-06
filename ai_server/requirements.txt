@@ -1,0 +1,15 @@
+paho-mqtt<2.0
+pymongo
+requests
+flask
+flask-cors
+opencv-python
+ultralytics
+torch
+pytesseract
+pillow
+numpy
+pandas
+matplotlib
+seaborn
+pyyaml
