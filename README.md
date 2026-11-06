@@ -43,6 +43,13 @@ For the smart parking module, a Python AI server works alongside the IoT devices
 * **Backend:** Python, Flask, paho-mqtt
 * **Database:** MongoDB
 
+## Contributors
+
+| Member | Student ID | Responsibilities |
+|---|---|---|
+| **Trần Nhật Minh** ([@MT-Espoir](https://github.com/MT-Espoir)) | 2212083 | AI server, camera & license plate recognition, RFID access control, database, MQTT |
+| **Trịnh Thị Mỹ Lệ** ([@MileeDevWork](https://github.com/MileeDevWork)) | 2211832 | Sensors, OTA firmware update, IoT dashboard |
+
 ## Repository Structure
 
 ```
